@@ -1,9 +1,9 @@
 import { LoggerModule } from 'nestjs-pino';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { PrismaModule, PrismaServiceOptions } from 'nestjs-prisma';
 import pretty from 'pino-pretty';
 
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 
@@ -23,10 +23,33 @@ import { AppController } from './app.controller';
             colorize: true,
           },
         },
+        customProps: (req) => {
+          return {
+            traceId: req['traceId'],
+          };
+        },
       },
+    }),
+    PrismaModule.forRootAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory(configService: ConfigService): PrismaServiceOptions {
+        return {
+          prismaOptions: {
+            log: [configService.getOrThrow('LOG_LEVEL')],
+            datasourceUrl: configService.getOrThrow('DATABASE_URL'),
+          },
+        };
+      },
+      inject: [ConfigService],
     }),
   ],
   controllers: [AppController],
   providers: [],
+  exports: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply().forRoutes('*');
+  }
+}

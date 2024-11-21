@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@lovenovel/book": ["libs/book/src/index.ts"],
       "@lovenovel/database": ["libs/database/src/index.ts"]
     }
   },

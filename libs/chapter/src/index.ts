@@ -1,1 +1,1 @@
-export * from './lib/chapter.module';
+export * from './chapter.module';

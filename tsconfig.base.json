@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@lovenovel/book": ["libs/book/src/index.ts"],
+      "@lovenovel/chapter": ["libs/chapter/src/index.ts"],
       "@lovenovel/database": ["libs/database/src/index.ts"],
       "@lovenovel/shared": ["libs/shared/src/index.ts"]
     }

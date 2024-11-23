@@ -1,10 +1,10 @@
 import { Paginated, PagingDTO } from '@lovenovel/shared';
 import { Inject, Injectable } from '@nestjs/common';
 
-import { BOOK_REPOSITORY } from './book.di-token';
-import { BookCondDTO, CreateBookDto, UpdateBookDto } from './book.dto';
-import { Book } from './book.model';
-import { IBookRepository, IBookService } from './book.port';
+import { Book } from '../../domain';
+import { BOOK_REPOSITORY } from '../../infrastructure';
+import { BookCondDTO, CreateBookDto, UpdateBookDto } from '../dto';
+import { IBookRepository, IBookService } from '../ports';
 
 @Injectable()
 export class BookService implements IBookService {

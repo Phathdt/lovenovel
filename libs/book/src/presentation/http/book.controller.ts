@@ -13,9 +13,13 @@ import {
   Query,
 } from '@nestjs/common';
 
-import { BOOK_SERVICE } from './book.di-token';
-import { BookCondDTO, CreateBookDto, UpdateBookDto } from './book.dto';
-import { IBookService } from './book.port';
+import {
+  BookCondDTO,
+  CreateBookDto,
+  IBookService,
+  UpdateBookDto,
+} from '../../application';
+import { BOOK_SERVICE } from '../../infrastructure';
 
 @Controller('books')
 export class BookHttpController {

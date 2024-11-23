@@ -3,9 +3,13 @@ import { Paginated, PagingDTO } from '@lovenovel/shared';
 import { Injectable } from '@nestjs/common';
 import { Book as BookPrisma } from '@prisma/client';
 
-import { BookCondDTO, CreateBookDto, UpdateBookDto } from './book.dto';
-import { Book } from './book.model';
-import { IBookRepository } from './book.port';
+import {
+  BookCondDTO,
+  CreateBookDto,
+  IBookRepository,
+  UpdateBookDto,
+} from '../../../application';
+import { Book } from '../../../domain';
 
 @Injectable()
 export class BookPrismaRepository implements IBookRepository {

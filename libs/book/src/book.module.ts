@@ -1,10 +1,13 @@
 import { DatabaseModule } from '@lovenovel/database';
 import { Module, Provider } from '@nestjs/common';
 
-import { BookHttpController } from './book-http.controller';
-import { BookPrismaRepository } from './book-prisma.repo';
-import { BOOK_REPOSITORY, BOOK_SERVICE } from './book.di-token';
-import { BookService } from './book.service';
+import { BookService } from './application';
+import {
+  BOOK_REPOSITORY,
+  BOOK_SERVICE,
+  BookPrismaRepository,
+} from './infrastructure';
+import { BookHttpController } from './presentation/http/book.controller';
 
 const repositories: Provider[] = [
   { provide: BOOK_REPOSITORY, useClass: BookPrismaRepository },

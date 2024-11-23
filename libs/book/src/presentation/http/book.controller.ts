@@ -1,4 +1,4 @@
-import { PagingDTO } from '@lovenovel/shared';
+import { paginatedResponse, PagingDTO } from '@lovenovel/shared';
 import {
   Body,
   Controller,
@@ -50,7 +50,9 @@ export class BookHttpController {
   }
 
   @Get()
-  async listBooks(@Query() cond: BookCondDTO, @Query() paging: PagingDTO) {
-    return this.listBooksUseCase.execute(cond, paging);
+  async listBooks(@Query() filter: BookCondDTO, @Query() paging: PagingDTO) {
+    const result = await this.listBooksUseCase.execute(filter, paging);
+
+    return paginatedResponse(result, filter);
   }
 }

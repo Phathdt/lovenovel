@@ -24,7 +24,6 @@ export class BookPrismaRepository implements IBookRepository {
   }
 
   async create(dto: CreateBookDto): Promise<void> {
-    // TODO: update me later
     const data = {
       title: dto.title,
       authorId: dto.authorId,
@@ -42,43 +41,30 @@ export class BookPrismaRepository implements IBookRepository {
   }
 
   async list(cond: BookCondDTO, paging: PagingDTO): Promise<Paginated<Book>> {
-    const { title, authorId, ...rest } = cond;
-
-    let where = {
-      ...rest,
+    const where = {
+      ...(cond.title && { title: { contains: cond.title } }),
+      ...(cond.authorId && { authorId: cond.authorId }),
     };
-
-    if (authorId) {
-      where = {
-        ...where,
-        authorId: authorId,
-      };
-    }
-
-    if (title) {
-      where = {
-        ...where,
-        title: { contains: title },
-      };
-    }
-
-    const total = await this.prisma.book.count({ where });
 
     const skip = (paging.page - 1) * paging.limit;
 
-    const result = await this.prisma.book.findMany({
-      where,
-      take: paging.limit,
-      skip,
-      orderBy: {
-        id: 'desc',
-      },
-    });
+    const [items, total] = await Promise.all([
+      this.prisma.book.findMany({
+        where,
+        skip: skip,
+        take: paging.limit,
+        orderBy: { id: 'desc' },
+      }),
+      this.prisma.book.count({
+        where,
+        select: { id: true },
+      }),
+    ]);
 
     return {
-      data: result.map(this._toModel),
+      data: items.map(this._toModel),
+      total: total.id,
       paging,
-      total,
     };
   }
 

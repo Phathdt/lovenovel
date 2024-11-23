@@ -1,7 +1,9 @@
 import { LoggerModule } from 'nestjs-pino';
 import { PrismaModule, PrismaServiceOptions } from 'nestjs-prisma';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import pretty from 'pino-pretty';
 
+import { BookModule } from '@lovenovel/book';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
@@ -43,6 +45,7 @@ import { AppController } from './app.controller';
       },
       inject: [ConfigService],
     }),
+    BookModule,
   ],
   controllers: [AppController],
   providers: [],

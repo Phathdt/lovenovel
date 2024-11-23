@@ -9,7 +9,7 @@ generator client {
 }
 
 model Author {
-  id   Int    @id @default(autoincrement())
+  id   String @id @default(uuid(7))
   name String
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -19,9 +19,9 @@ model Author {
 }
 
 model Book {
-  id       Int    @id @default(autoincrement())
+  id       String @id @default(uuid(7))
   title    String
-  authorId Int    @map("author_id")
+  authorId String @map("author_id") @db.VarChar(36)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -30,10 +30,10 @@ model Book {
 }
 
 model Chapter {
-  id      Int    @id @default(autoincrement())
+  id      String @id @default(uuid(7))
   title   String
   content String
-  bookId  Int    @map("book_id")
+  bookId  String @map("book_id") @db.VarChar(36)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

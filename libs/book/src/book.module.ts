@@ -1,24 +1,31 @@
 import { DatabaseModule } from '@lovenovel/database';
 import { Module, Provider } from '@nestjs/common';
 
-import { BookService } from './application';
-import {
-  BOOK_REPOSITORY,
-  BOOK_SERVICE,
-  BookPrismaRepository,
-} from './infrastructure';
+import { BOOK_REPOSITORY, BookPrismaRepository } from './infrastructure';
 import { BookHttpController } from './presentation/http/book.controller';
+import {
+  CreateBookUseCase,
+  DeleteBookUseCase,
+  GetBookUseCase,
+  ListBooksUseCase,
+  UpdateBookUseCase,
+} from './usecases';
 
 const repositories: Provider[] = [
   { provide: BOOK_REPOSITORY, useClass: BookPrismaRepository },
 ];
 
-const services: Provider[] = [{ provide: BOOK_SERVICE, useClass: BookService }];
-
+const UseCases = [
+  CreateBookUseCase,
+  GetBookUseCase,
+  UpdateBookUseCase,
+  DeleteBookUseCase,
+  ListBooksUseCase,
+];
 @Module({
   imports: [DatabaseModule],
   controllers: [BookHttpController],
-  providers: [...repositories, ...services],
+  providers: [...repositories, ...UseCases],
   exports: [],
 })
 export class BookModule {}

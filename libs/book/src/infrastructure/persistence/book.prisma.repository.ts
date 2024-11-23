@@ -8,8 +8,8 @@ import {
   CreateBookDto,
   IBookRepository,
   UpdateBookDto,
-} from '../../../application';
-import { Book } from '../../../domain';
+} from '../../application';
+import { Book } from '../../domain';
 
 @Injectable()
 export class BookPrismaRepository implements IBookRepository {

@@ -1,68 +1,56 @@
-import { paginatedResponse, PagingDTO } from '@lovenovel/shared';
+import { PagingDTO } from '@lovenovel/shared';
 import {
   Body,
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
-  Inject,
   Param,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
 
+import { BookCondDTO, CreateBookDto, UpdateBookDto } from '../../application';
 import {
-  BookCondDTO,
-  CreateBookDto,
-  IBookService,
-  UpdateBookDto,
-} from '../../application';
-import { BOOK_SERVICE } from '../../infrastructure';
+  CreateBookUseCase,
+  DeleteBookUseCase,
+  GetBookUseCase,
+  ListBooksUseCase,
+  UpdateBookUseCase,
+} from '../../usecases';
 
 @Controller('books')
 export class BookHttpController {
   constructor(
-    @Inject(BOOK_SERVICE) private readonly bookService: IBookService
+    private readonly createBookUseCase: CreateBookUseCase,
+    private readonly getBookUseCase: GetBookUseCase,
+    private readonly updateBookUseCase: UpdateBookUseCase,
+    private readonly deleteBookUseCase: DeleteBookUseCase,
+    private readonly listBooksUseCase: ListBooksUseCase
   ) {}
 
-  @Get('/:id')
-  @HttpCode(HttpStatus.OK)
-  async get(@Param('id') id: string) {
-    const data = await this.bookService.get(id);
-
-    return data;
+  @Post()
+  async createBook(@Body() dto: CreateBookDto) {
+    await this.createBookUseCase.execute(dto);
   }
 
-  @Post('')
-  @HttpCode(HttpStatus.OK)
-  async create(@Body() dto: CreateBookDto) {
-    await this.bookService.create(dto);
+  @Get(':id')
+  async getBook(@Param('id') id: string) {
+    return this.getBookUseCase.execute(id);
+  }
 
-    return { msg: 'ok' };
+  @Put(':id')
+  async updateBook(@Param('id') id: string, @Body() dto: UpdateBookDto) {
+    await this.updateBookUseCase.execute(id, dto);
+  }
+
+  @Delete(':id')
+  async deleteBook(@Param('id') id: string) {
+    await this.deleteBookUseCase.execute(id);
   }
 
   @Get()
-  async listBook(@Query() filter: BookCondDTO, @Query() paging: PagingDTO) {
-    const result = await this.bookService.list(filter, paging);
-
-    return paginatedResponse(result, filter);
-  }
-
-  @Put('/:id')
-  @HttpCode(HttpStatus.OK)
-  async update(@Param('id') id: string, @Body() dto: UpdateBookDto) {
-    await this.bookService.update(id, dto);
-
-    return { msg: 'ok' };
-  }
-
-  @Delete('/:id')
-  @HttpCode(HttpStatus.OK)
-  async delete(@Body() dto: CreateBookDto) {
-    await this.bookService.create(dto);
-
-    return { msg: 'ok' };
+  async listBooks(@Query() cond: BookCondDTO, @Query() paging: PagingDTO) {
+    return this.listBooksUseCase.execute(cond, paging);
   }
 }

@@ -5,15 +5,32 @@ function shouldIgnoreFile(filename: string): boolean {
   return filename === 'index.ts' || filename.startsWith('.');
 }
 
-function generateIndexContent(files: string[]): string {
-  return (
-    files
-      .map((file) => {
-        const filename = path.basename(file, path.extname(file));
+function generateIndexContent(files: string[], isRoot = false): string {
+  const exports = files
+    .map((file) => {
+      const filename = path.basename(file, path.extname(file));
+      if (isRoot && filename !== 'index') {
         return `export * from './${filename}';`;
-      })
-      .join('\n') + '\n'
-  );
+      }
+      return `export * from './${filename}';`;
+    })
+    .join('\n');
+
+  return exports ? exports + '\n' : '';
+}
+
+function deleteIndexFiles(dirPath: string) {
+  const indexPath = path.join(dirPath, 'index.ts');
+  if (fs.existsSync(indexPath)) {
+    fs.unlinkSync(indexPath);
+  }
+
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+  entries
+    .filter((entry) => entry.isDirectory())
+    .forEach((dir) => {
+      deleteIndexFiles(path.join(dirPath, dir.name));
+    });
 }
 
 function processModule(dirPath: string) {
@@ -28,40 +45,32 @@ function processModule(dirPath: string) {
     )
     .map((entry) => path.join(dirPath, entry.name));
 
-  if (tsFiles.length > 0) {
-    const indexContent = generateIndexContent(tsFiles);
-    fs.writeFileSync(path.join(dirPath, 'index.ts'), indexContent);
-  }
-
   const subdirectories = entries.filter((entry) => entry.isDirectory());
-
-  if (subdirectories.length > 0) {
-    const currentIndexPath = path.join(dirPath, 'index.ts');
-    let exports = '';
-
-    subdirectories.forEach((dir) => {
+  const subDirExports = subdirectories
+    .map((dir) => {
       const subdirPath = path.join(dirPath, dir.name);
       processModule(subdirPath);
 
       if (fs.readdirSync(subdirPath).length > 0) {
-        exports += `export * from './${dir.name}';\n`;
+        return `export * from './${dir.name}';`;
       }
-    });
+      return '';
+    })
+    .filter(Boolean)
+    .join('\n');
 
-    if (exports) {
-      if (fs.existsSync(currentIndexPath)) {
-        const existingContent = fs.readFileSync(currentIndexPath, 'utf8');
-        const newExports = exports
-          .split('\n')
-          .filter((line) => line && !existingContent.includes(line))
-          .join('\n');
-        if (newExports) {
-          fs.appendFileSync(currentIndexPath, '\n' + newExports);
-        }
-      } else {
-        fs.writeFileSync(currentIndexPath, exports);
-      }
-    }
+  let content = '';
+
+  if (tsFiles.length > 0) {
+    content += generateIndexContent(tsFiles, path.basename(dirPath) === 'src');
+  }
+
+  if (subDirExports) {
+    content += (content ? '\n' : '') + subDirExports + '\n';
+  }
+
+  if (content) {
+    fs.writeFileSync(path.join(dirPath, 'index.ts'), content);
   }
 }
 
@@ -79,12 +88,13 @@ function generateLibsIndexes() {
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name);
 
-  console.log('Found modules:', libModules);
-
   libModules.forEach((moduleName) => {
     const srcPath = path.join(libsDir, moduleName, 'src');
     if (fs.existsSync(srcPath)) {
       console.log(`\nProcessing module: ${moduleName}`);
+      console.log('Cleaning up old index files...');
+      deleteIndexFiles(srcPath);
+      console.log('Generating new index files...');
       processModule(srcPath);
     } else {
       console.warn(`Warning: src directory not found in ${moduleName}`);
@@ -94,7 +104,7 @@ function generateLibsIndexes() {
 
 try {
   generateLibsIndexes();
-  console.log('\nSuccessfully generated all index.ts files!');
+  console.log('\nSuccessfully regenerated all index.ts files!');
 } catch (error) {
   console.error('Error generating index files:', error);
   process.exit(1);

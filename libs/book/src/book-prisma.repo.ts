@@ -1,8 +1,9 @@
 import { DatabaseService } from '@lovenovel/database';
+import { Paginated, PagingDTO } from '@lovenovel/shared';
 import { Injectable } from '@nestjs/common';
 import { Book as BookPrisma } from '@prisma/client';
 
-import { CreateBookDto, UpdateBookDto } from './book.dto';
+import { BookCondDTO, CreateBookDto, UpdateBookDto } from './book.dto';
 import { Book } from './book.model';
 import { IBookRepository } from './book.port';
 
@@ -34,6 +35,55 @@ export class BookPrismaRepository implements IBookRepository {
 
   async delete(id: string): Promise<void> {
     await this.prisma.book.delete({ where: { id } });
+  }
+
+  async list(cond: BookCondDTO, paging: PagingDTO): Promise<Paginated<Book>> {
+    const { title, authorId, ...rest } = cond;
+
+    let where = {
+      ...rest,
+    };
+
+    if (authorId) {
+      where = {
+        ...where,
+        authorId: authorId,
+      };
+    }
+
+    if (title) {
+      where = {
+        ...where,
+        title: { contains: title },
+      };
+    }
+
+    const total = await this.prisma.book.count({ where });
+
+    const skip = (paging.page - 1) * paging.limit;
+
+    const result = await this.prisma.book.findMany({
+      where,
+      take: paging.limit,
+      skip,
+      orderBy: {
+        id: 'desc',
+      },
+    });
+
+    return {
+      data: result.map(this._toModel),
+      paging,
+      total,
+    };
+  }
+
+  async listByIds(ids: string[]): Promise<Book[]> {
+    const result = await this.prisma.book.findMany({
+      where: { id: { in: ids } },
+    });
+
+    return result.map(this._toModel);
   }
 
   private _toModel(data: BookPrisma): Book {

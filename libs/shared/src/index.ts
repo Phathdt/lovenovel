@@ -1,1 +1,2 @@
-export * from './lib/shared';
+export * from './data-model';
+export * from './utils';

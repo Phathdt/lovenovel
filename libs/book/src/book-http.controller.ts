@@ -1,3 +1,4 @@
+import { paginatedResponse, PagingDTO } from '@lovenovel/shared';
 import {
   Body,
   Controller,
@@ -9,10 +10,11 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 
 import { BOOK_SERVICE } from './book.di-token';
-import { CreateBookDto, UpdateBookDto } from './book.dto';
+import { BookCondDTO, CreateBookDto, UpdateBookDto } from './book.dto';
 import { IBookService } from './book.port';
 
 @Controller('books')
@@ -26,30 +28,37 @@ export class BookHttpController {
   async get(@Param('id') id: string) {
     const data = await this.bookService.get(id);
 
-    return { data };
+    return data;
   }
 
   @Post('')
   @HttpCode(HttpStatus.OK)
   async create(@Body() dto: CreateBookDto) {
-    const data = await this.bookService.create(dto);
+    await this.bookService.create(dto);
 
-    return { data };
+    return { msg: 'ok' };
+  }
+
+  @Get()
+  async listBook(@Query() filter: BookCondDTO, @Query() paging: PagingDTO) {
+    const result = await this.bookService.list(filter, paging);
+
+    return paginatedResponse(result, filter);
   }
 
   @Put('/:id')
   @HttpCode(HttpStatus.OK)
   async update(@Param('id') id: string, @Body() dto: UpdateBookDto) {
-    const data = await this.bookService.update(id, dto);
+    await this.bookService.update(id, dto);
 
-    return { data };
+    return { msg: 'ok' };
   }
 
   @Delete('/:id')
   @HttpCode(HttpStatus.OK)
   async delete(@Body() dto: CreateBookDto) {
-    const data = await this.bookService.create(dto);
+    await this.bookService.create(dto);
 
-    return { data };
+    return { msg: 'ok' };
   }
 }

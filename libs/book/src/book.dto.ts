@@ -1,3 +1,4 @@
+import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
 import { BookSchema } from './book.model';
@@ -7,11 +8,18 @@ export const CreateBookSchema = BookSchema.pick({
   authorId: true,
 }).required();
 
-export type CreateBookDto = z.infer<typeof CreateBookSchema>;
+export class CreateBookDto extends createZodDto(CreateBookSchema) {}
 
 export const UpdateBookSchema = BookSchema.pick({
   title: true,
   authorId: true,
 }).partial();
 
-export type UpdateBookDto = z.infer<typeof UpdateBookSchema>;
+export class UpdateBookDto extends createZodDto(UpdateBookSchema) {}
+
+export const BookCondSchema = z.object({
+  title: z.string().optional(),
+  authorId: z.string().uuid().optional(),
+});
+
+export class BookCondDTO extends createZodDto(BookCondSchema) {}

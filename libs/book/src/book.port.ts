@@ -1,4 +1,6 @@
-import { CreateBookDto, UpdateBookDto } from './book.dto';
+import { Paginated, PagingDTO } from '@lovenovel/shared';
+
+import { BookCondDTO, CreateBookDto, UpdateBookDto } from './book.dto';
 import { Book } from './book.model';
 
 export interface IBookRepository {
@@ -6,6 +8,8 @@ export interface IBookRepository {
   create(dto: CreateBookDto): Promise<void>;
   update(id: string, dto: UpdateBookDto): Promise<void>;
   delete(id: string): Promise<void>;
+  list(cond: BookCondDTO, paging: PagingDTO): Promise<Paginated<Book>>;
+  listByIds(ids: string[]): Promise<Book[]>;
 }
 
 export interface IBookService {
@@ -13,4 +17,5 @@ export interface IBookService {
   create(dto: CreateBookDto): Promise<void>;
   update(id: string, dto: UpdateBookDto): Promise<void>;
   delete(id: string): Promise<void>;
+  list(cond: BookCondDTO, paging: PagingDTO): Promise<Paginated<Book>>;
 }

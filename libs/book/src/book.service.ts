@@ -1,7 +1,8 @@
+import { Paginated, PagingDTO } from '@lovenovel/shared';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { BOOK_REPOSITORY } from './book.di-token';
-import { CreateBookDto, UpdateBookDto } from './book.dto';
+import { BookCondDTO, CreateBookDto, UpdateBookDto } from './book.dto';
 import { Book } from './book.model';
 import { IBookRepository, IBookService } from './book.port';
 
@@ -10,6 +11,10 @@ export class BookService implements IBookService {
   constructor(
     @Inject(BOOK_REPOSITORY) private readonly bookRepo: IBookRepository
   ) {}
+
+  async list(cond: BookCondDTO, paging: PagingDTO): Promise<Paginated<Book>> {
+    return await this.bookRepo.list(cond, paging);
+  }
 
   async get(id: string): Promise<Book | null> {
     return await this.bookRepo.get(id);

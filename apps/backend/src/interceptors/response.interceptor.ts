@@ -19,6 +19,10 @@ export class ResponseInterceptor implements NestInterceptor {
           return { ...data, traceId };
         }
 
+        if (data && data.paging && data.total !== undefined) {
+          return { ...data, traceId };
+        }
+
         return { data, traceId };
       })
     );

@@ -32,6 +32,8 @@ export class BookHttpController {
   @Post()
   async createBook(@Body() dto: CreateBookDto) {
     await this.createBookUseCase.execute(dto);
+
+    return { msg: 'ok' };
   }
 
   @Get(':id')
@@ -42,11 +44,15 @@ export class BookHttpController {
   @Put(':id')
   async updateBook(@Param('id') id: string, @Body() dto: UpdateBookDto) {
     await this.updateBookUseCase.execute(id, dto);
+
+    return { msg: 'ok' };
   }
 
   @Delete(':id')
   async deleteBook(@Param('id') id: string) {
     await this.deleteBookUseCase.execute(id);
+
+    return { msg: 'ok' };
   }
 
   @Get()

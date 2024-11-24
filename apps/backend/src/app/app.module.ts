@@ -7,6 +7,7 @@ import { BookModule } from '@lovenovel/book';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
+import { ChapterModule } from '@lovenovel/chapter';
 import { AppController } from './app.controller';
 
 @Module({
@@ -46,6 +47,7 @@ import { AppController } from './app.controller';
       inject: [ConfigService],
     }),
     BookModule,
+    ChapterModule,
   ],
   controllers: [AppController],
   providers: [],

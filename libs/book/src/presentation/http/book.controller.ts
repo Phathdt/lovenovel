@@ -20,7 +20,7 @@ import {
 } from '../../usecases';
 
 @Controller('books')
-export class BookHttpController {
+export class BookController {
   constructor(
     private readonly createBookUseCase: CreateBookUseCase,
     private readonly getBookUseCase: GetBookUseCase,

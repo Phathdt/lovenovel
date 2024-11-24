@@ -2,7 +2,7 @@ import { DatabaseModule } from '@lovenovel/database';
 import { Module, Provider } from '@nestjs/common';
 
 import { BOOK_REPOSITORY, BookPrismaRepository } from './infrastructure';
-import { BookHttpController } from './presentation/http/book.controller';
+import { BookController } from './presentation/http/book.controller';
 import {
   CreateBookUseCase,
   DeleteBookUseCase,
@@ -24,7 +24,7 @@ const UseCases = [
 ];
 @Module({
   imports: [DatabaseModule],
-  controllers: [BookHttpController],
+  controllers: [BookController],
   providers: [...repositories, ...UseCases],
   exports: [],
 })

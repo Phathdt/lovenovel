@@ -1,5 +1,3 @@
-import { filter } from 'rxjs';
-
 import { paginatedResponse, PagingDTO } from '@lovenovel/shared';
 import {
   Body,
